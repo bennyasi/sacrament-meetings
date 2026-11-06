@@ -1,26 +1,198 @@
+
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f5f7fb;
+  --foreground: #202b3c;
+  --primary: #244b70;
+  --secondary: #e9f0f7;
+  --border: #dce4ed;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-header {
+  background: var(--primary);
+  color: white;
+  padding: 20px 5%;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.navigation,
+.meeting-navigation {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.navigation a:hover,
+.meeting-navigation a:hover {
+  text-decoration: underline;
+}
+
+.site-footer {
+  margin-top: 60px;
+  padding: 30px 5%;
+  background: #183650;
+  color: white;
+  text-align: center;
+}
+
+.site-footer p {
+  margin: 5px 0;
+}
+
+main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 40px 5%;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.3;
+}
+
+.meeting-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 25px;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.meeting-date,
+.program-label {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.meeting-details {
+  margin: 20px 0;
+}
+
+.view-meeting-button,
+.print-button {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.view-meeting-button:hover,
+.print-button:hover {
+  background: #17344f;
+}
+
+.program-header {
+  text-align: center;
+  padding: 30px;
+  background: var(--secondary);
+  border-radius: 12px;
+}
+
+.meeting-leadership,
+.meeting-hymns,
+.meeting-agenda,
+.meeting-speakers {
+  background: white;
+  padding: 25px;
+  margin: 25px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.agenda-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.speaker-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.meeting-navigation {
+  margin-bottom: 25px;
+}
+
+@media (max-width: 650px) {
+  .header-container {
+    flex-direction: column;
+  }
+
+  .navigation {
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .agenda-item {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+@media print {
+  .site-header,
+  .site-footer,
+  .print-button,
+  .meeting-navigation {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  .meeting-program {
+    max-width: 100%;
+  }
+
+  .meeting-leadership,
+  .meeting-hymns,
+  .meeting-agenda,
+  .meeting-speakers {
+    break-inside: avoid;
+  }
 }
