@@ -1,56 +1,48 @@
 
 import { NextResponse } from "next/server";
+import {
+  getMeetings,
+  addMeeting,
+} from "@/lib/meetings-db";
 
-const meetings = [
-  {
-    id: "1",
-    title: "Sunday Worship Service",
-    date: "2026-11-08",
-    time: "10:00 AM",
-    location: "Main Chapel",
-    theme: "Faith in Jesus Christ",
-  },
-  {
-    id: "2",
-    title: "Sacrament Meeting",
-    date: "2026-11-15",
-    time: "10:00 AM",
-    location: "Main Chapel",
-    theme: "Following the Savior",
-  },
-];
+export const dynamic = "force-dynamic";
 
+// GET: Retrieve meetings from Neon PostgreSQL
 export async function GET() {
-  return NextResponse.json(meetings);
+  try {
+    const meetings = await getMeetings();
+    return NextResponse.json(meetings);
+  } catch (error) {
+    console.error("GET meetings error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to retrieve meetings." },
+      { status: 500 }
+    );
+  }
 }
 
+// POST: Save a new meeting to Neon PostgreSQL
 export async function POST(request: Request) {
   try {
     const data = await request.json();
 
-    if (!data.title || !data.date || !data.time) {
+    if (!data.date || !data.title) {
       return NextResponse.json(
-        { message: "Title, date, and time are required." },
+        { message: "Meeting title and date are required." },
         { status: 400 }
       );
     }
 
-    const newMeeting = {
-      id: crypto.randomUUID(),
-      title: data.title,
-      date: data.date,
-      time: data.time,
-      location: data.location || "Main Chapel",
-      theme: data.theme || "",
-    };
-
-    meetings.push(newMeeting);
+    const newMeeting = await addMeeting(data);
 
     return NextResponse.json(newMeeting, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("POST meeting error:", error);
+
     return NextResponse.json(
-      { message: "Invalid request." },
-      { status: 400 }
+      { message: "Unable to save meeting." },
+      { status: 500 }
     );
   }
 }
