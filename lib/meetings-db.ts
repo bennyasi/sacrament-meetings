@@ -331,17 +331,21 @@ export async function addMeeting(
       ${meeting.pianist || ""},
       ARRAY[]::text[],
       ${JSON.stringify({ title: meeting.openingHymn || "" })}::jsonb,
-      ${meeting.agenda?.find(
-        (item) => item.title === "Opening Prayer"
-      )?.name || ""},
+      ${
+        meeting.agenda?.find(
+          (item) => item.title === "Opening Prayer"
+        )?.name || ""
+      },
       ${JSON.stringify([])}::jsonb,
       ${false},
       ${JSON.stringify({ title: meeting.sacramentHymn || "" })}::jsonb,
       ${JSON.stringify(meeting.speakers || [])}::jsonb,
       ${JSON.stringify({ title: meeting.closingHymn || "" })}::jsonb,
-      ${meeting.agenda?.find(
-        (item) => item.title === "Closing Prayer"
-      )?.name || ""}
+      ${
+        meeting.agenda?.find(
+          (item) => item.title === "Closing Prayer"
+        )?.name || ""
+      }
     )
     RETURNING
       id,
@@ -367,6 +371,10 @@ export async function addMeeting(
       closing_prayer
   `;
 
+  if (rows.length === 0) {
+    throw new Error("Meeting could not be created.");
+  }
+
   return mapMeeting(rows[0] as unknown as DatabaseMeetingRow);
 }
 
@@ -375,18 +383,81 @@ export async function addMeeting(
 // ==========================================
 
 export async function updateMeeting(
-  _id: string,
-  _meeting: SacramentMeeting
-): Promise<never> {
-  throw new Error("Update meeting is not implemented yet.");
+  id: string,
+  meeting: SacramentMeeting
+): Promise<SacramentMeeting> {
+  const rows = await sql`
+    UPDATE meetings
+    SET
+      date = ${meeting.date},
+      meeting_type = ${meeting.title || "Sacrament Meeting"},
+      theme = ${meeting.theme || ""},
+      time = ${meeting.time || "10:00 AM"},
+      location = ${meeting.location || "Main Chapel"},
+      ward = ${meeting.ward || ""},
+      branch = ${meeting.branch || ""},
+      presiding = ${meeting.presiding || ""},
+      conducting = ${meeting.conducting || ""},
+      chorister = ${meeting.chorister || ""},
+      pianist = ${meeting.pianist || ""},
+      opening_hymn = ${JSON.stringify({ title: meeting.openingHymn || "" })}::jsonb,
+      opening_prayer = ${
+        meeting.agenda?.find(
+          (item) => item.title === "Opening Prayer"
+        )?.name || ""
+      },
+      sacrament_hymn = ${JSON.stringify({ title: meeting.sacramentHymn || "" })}::jsonb,
+      speakers = ${JSON.stringify(meeting.speakers || [])}::jsonb,
+      closing_hymn = ${JSON.stringify({ title: meeting.closingHymn || "" })}::jsonb,
+      closing_prayer = ${
+        meeting.agenda?.find(
+          (item) => item.title === "Closing Prayer"
+        )?.name || ""
+      }
+    WHERE id = ${id}
+    RETURNING
+      id,
+      date,
+      meeting_type,
+      theme,
+      time,
+      location,
+      ward,
+      branch,
+      presiding,
+      conducting,
+      chorister,
+      pianist,
+      announcements,
+      opening_hymn,
+      opening_prayer,
+      ward_business,
+      stake_business,
+      sacrament_hymn,
+      speakers,
+      closing_hymn,
+      closing_prayer
+  `;
+
+  if (rows.length === 0) {
+    throw new Error("Meeting not found.");
+  }
+
+  return mapMeeting(rows[0] as unknown as DatabaseMeetingRow);
 }
 
 // ==========================================
 // DELETE MEETING
 // ==========================================
 
-export async function deleteMeeting(
-  _id: string
-): Promise<never> {
-  throw new Error("Delete meeting is not implemented yet.");
+export async function deleteMeeting(id: string): Promise<void> {
+  const rows = await sql`
+    DELETE FROM meetings
+    WHERE id = ${id}
+    RETURNING id
+  `;
+
+  if (rows.length === 0) {
+    throw new Error("Meeting not found.");
+  }
 }
