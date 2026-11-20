@@ -58,10 +58,6 @@ export default function Home() {
           </p>
         </div>
       </section>
-
-      <footer className="border-t border-slate-200 py-6 text-center text-sm text-slate-500">
-        Sacrament Meeting Planner © 2026
-      </footer>
     </main>
   );
 }
