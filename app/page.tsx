@@ -21,7 +21,7 @@ export default function Home() {
 
         <Link
           href="/meetings"
-          className="inline-block rounded-lg bg-amber-400 px-8 py-4 font-semibold text-slate-900 transition hover:bg-amber-300"
+          className="inline-block rounded-lg bg-amber-300 px-8 py-4 font-semibold text-slate-950 transition hover:bg-amber-200"
         >
           View Meetings
         </Link>
