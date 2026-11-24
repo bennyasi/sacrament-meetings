@@ -1,5 +1,6 @@
 
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 
 const meetings = [
   {
@@ -24,8 +25,9 @@ type Context = {
   params: Promise<{ id: string }>;
 };
 
+// GET: Public access to a meeting.
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: Context
 ) {
   const { id } = await params;
@@ -33,7 +35,7 @@ export async function GET(
 
   if (!meeting) {
     return NextResponse.json(
-      { message: "Meeting not found" },
+      { message: "Meeting not found." },
       { status: 404 }
     );
   }
@@ -41,16 +43,26 @@ export async function GET(
   return NextResponse.json(meeting);
 }
 
+// PUT: Authenticated users only.
 export async function PUT(
   request: Request,
   { params }: Context
 ) {
+  const session = await auth();
+
+  if (!session?.user) {
+    return NextResponse.json(
+      { message: "Authentication required." },
+      { status: 401 }
+    );
+  }
+
   const { id } = await params;
   const meeting = meetings.find((item) => item.id === id);
 
   if (!meeting) {
     return NextResponse.json(
-      { message: "Meeting not found" },
+      { message: "Meeting not found." },
       { status: 404 }
     );
   }
@@ -69,16 +81,26 @@ export async function PUT(
     return NextResponse.json(meeting);
   } catch {
     return NextResponse.json(
-      { message: "Invalid request" },
+      { message: "Invalid request." },
       { status: 400 }
     );
   }
 }
 
+// DELETE: Authenticated users only.
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: Context
 ) {
+  const session = await auth();
+
+  if (!session?.user) {
+    return NextResponse.json(
+      { message: "Authentication required." },
+      { status: 401 }
+    );
+  }
+
   const { id } = await params;
 
   return NextResponse.json({

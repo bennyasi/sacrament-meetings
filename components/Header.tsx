@@ -13,6 +13,7 @@ export default function Header() {
           <Link href="/">Home</Link>
           <Link href="/meetings">Meetings</Link>
           <Link href="/meetings/current">Current Meeting</Link>
+          <Link href="/login">Bishopric Login</Link>
         </nav>
       </div>
     </header>

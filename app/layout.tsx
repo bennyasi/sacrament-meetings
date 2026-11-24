@@ -5,7 +5,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Sacrament Meeting Planner",
+  metadataBase: new URL("https://sacrament-meetings-cug8.vercel.app"),
+  title: {
+    default: "Sacrament Meeting Planner",
+    template: "%s | Sacrament Meeting Planner",
+  },
   description:
     "Plan, organize, and manage sacrament meeting programs.",
 };

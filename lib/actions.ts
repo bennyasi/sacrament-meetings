@@ -1,6 +1,7 @@
 ﻿
 "use server";
 
+import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -12,10 +13,6 @@ import {
 } from "@/lib/meetings-db";
 
 import type { SacramentMeeting } from "@/lib/types";
-
-// ==========================================
-// VALIDATION
-// ==========================================
 
 const meetingSchema = z.object({
   date: z.string().min(1, "Meeting date is required."),
@@ -42,6 +39,14 @@ export type MeetingFormState = {
   errors?: Record<string, string[]>;
   message?: string;
 };
+
+async function requireAuthentication() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+}
 
 function getFormValues(formData: FormData) {
   return {
@@ -112,14 +117,12 @@ function createMeetingObject(
   };
 }
 
-// ==========================================
-// CREATE MEETING
-// ==========================================
-
 export async function createMeeting(
   _previousState: MeetingFormState,
   formData: FormData
 ): Promise<MeetingFormState> {
+  await requireAuthentication();
+
   const validatedFields = meetingSchema.safeParse(
     getFormValues(formData)
   );
@@ -131,10 +134,7 @@ export async function createMeeting(
     };
   }
 
-  const meeting = createMeetingObject(
-    validatedFields.data,
-    ""
-  );
+  const meeting = createMeetingObject(validatedFields.data, "");
 
   try {
     await addMeeting(meeting);
@@ -150,14 +150,12 @@ export async function createMeeting(
   redirect("/meetings");
 }
 
-// ==========================================
-// UPDATE MEETING
-// ==========================================
-
 export async function updateMeeting(
   _previousState: MeetingFormState,
   formData: FormData
 ): Promise<MeetingFormState> {
+  await requireAuthentication();
+
   const id = formData.get("id");
 
   if (typeof id !== "string" || !id.trim()) {
@@ -177,10 +175,7 @@ export async function updateMeeting(
     };
   }
 
-  const meeting = createMeetingObject(
-    validatedFields.data,
-    id
-  );
+  const meeting = createMeetingObject(validatedFields.data, id);
 
   try {
     await updateMeetingInDatabase(id, meeting);
@@ -197,13 +192,11 @@ export async function updateMeeting(
   redirect(`/meetings/${id}`);
 }
 
-// ==========================================
-// DELETE MEETING
-// ==========================================
-
 export async function deleteMeeting(
   formData: FormData
 ): Promise<void> {
+  await requireAuthentication();
+
   const id = formData.get("id");
 
   if (typeof id !== "string" || !id.trim()) {
@@ -215,4 +208,3 @@ export async function deleteMeeting(
   revalidatePath("/meetings");
   redirect("/meetings");
 }
-
